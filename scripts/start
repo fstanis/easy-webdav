@@ -1,0 +1,74 @@
+#!/bin/sh -e
+
+# Loads and validates the config file, generates the user routes and then starts
+# the webserver.
+
+# Copyright 2020 Google LLC.
+# SPDX-License-Identifier: Apache-2.0
+
+die () { echo "$1"; exit 1; }
+
+# Should be set by the base image
+test -d "$HTTPD_PREFIX" || die '$HTTPD_PREFIX not set'
+
+set -a
+source /etc/config
+set +a
+
+# Verify that the files and directories in the config are valid
+test -d "$WEBDAV_DATA" || die '$WEBDAV_DATA set to invalid directory'
+test -f "$WEBDAV_USERS" || die '$WEBDAV_USERS set to invalid file'
+test -f "$WEBDAV_SSL_CERT" || die '$WEBDAV_SSL_CERT set to invalid file'
+test -f "$WEBDAV_SSL_CERT_KEY" || die '$WEBDAV_SSL_CERT_KEY set to invalid file'
+
+# Config defaults
+test -z "$WEBDAV_RUN_AS" && export WEBDAV_RUN_AS="webdav"
+test -z "$WEBDAV_CONFIG" && export WEBDAV_CONFIG="$HTTPD_PREFIX/conf/webdav.conf"
+test -z "$WEBDAV_USERS_CONFIG" && export WEBDAV_USERS_CONFIG="$HTTPD_PREFIX/conf/webdav_users.conf"
+test -z "$WEBDAV_LOCKFILE" && export WEBDAV_LOCKFILE="/etc/lock/lockfile"
+
+# Create user (if needed)
+if ! id "$WEBDAV_RUN_AS" &> /dev/null; then
+  addgroup -g 1000 "$WEBDAV_RUN_AS"
+  adduser -D -H -G "$WEBDAV_RUN_AS" -u 1000 "$WEBDAV_RUN_AS"
+fi
+
+# Create the required directories and set permissions
+lockfile_dir="$(dirname $WEBDAV_LOCKFILE)"
+mkdir -p "$lockfile_dir"
+chown -R "$WEBDAV_RUN_AS":"$WEBDAV_RUN_AS" "$WEBDAV_DATA" "$lockfile_dir"
+chmod -R 774 "$WEBDAV_DATA" "$lockfile_dir"
+
+# Generate the users config that rules for each user's directory
+truncate -s 0 "$WEBDAV_USERS_CONFIG"
+for user in $(grep -o '^[^:]\+' "$WEBDAV_USERS"); do
+  if [[ "$user" == "$WEBDAV_SUPERUSER" ]]; then
+    found_superuser=1
+  elif [[ "$user" == "$WEBDAV_RO_USER" ]]; then
+    found_ro_user=1
+  else
+    printf 'Use UserDir %s\n' "$user" >> "$WEBDAV_USERS_CONFIG"
+    mkdir -p "$WEBDAV_DATA/$user"
+  fi
+done
+
+# If WEBDAV_SUPERUSER is set, it must be a real user
+if [[ -n "$WEBDAV_SUPERUSER" ]]; then
+  test -z "$found_superuser" && die '$WEBDAV_SUPERUSER not found in users'
+  export WEBDAV_FLAG_SUPERUSER=1
+fi
+# If WEBDAV_RO_USER is set, it must be a real user
+if [[ -n "$WEBDAV_RO_USER" ]]; then
+  test -z "$found_ro_user" && die '$WEBDAV_RO_USER not found in users'
+  export WEBDAV_FLAG_RO_USER=1
+fi
+# If WEBDAV_PUBLIC is set, make sure it exists
+if [[ -n "$WEBDAV_PUBLIC" ]]; then
+  export WEBDAV_FLAG_PUBLIC=1
+  mkdir -p "$WEBDAV_DATA/$WEBDAV_PUBLIC"
+fi
+
+# Pass all exports that start with WEBDAV_FLAG_ as parameters to make them
+# accessible from <IfDefine> in Apache config
+flags=$(env | grep -o '^WEBDAV_FLAG_[^=]\+' | xargs printf '-D%s ')
+httpd-foreground $flags

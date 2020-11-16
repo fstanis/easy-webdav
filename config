@@ -1,0 +1,47 @@
+# How your server should identify itself. Use your domain name here.
+SERVER_NAME="example.com"
+
+# Port to bind the server to.
+PORT="443"
+
+# Path to folder that holds all your files.
+WEBDAV_DATA="/data"
+
+# Path to a folder that's publicly available. Omit to disable.
+WEBDAV_PUBLIC="public"
+
+# Special user that has full access to all folders. Omit to disable.
+WEBDAV_SUPERUSER="admin"
+
+# Special user that has read access to all folders. Omit to disable.
+WEBDAV_RO_USER="reader"
+
+# Path to your htpasswd-based users file.
+WEBDAV_USERS="/run/secrets/users"
+
+# Path to the SSL certificate file.
+WEBDAV_SSL_CERT="/run/secrets/fullchain"
+
+# Path to the SSL certificate private key file.
+WEBDAV_SSL_CERT_KEY="/run/secrets/privkey"
+
+# Log all requests to STDOUT.
+WEBDAV_FLAG_VERBOSE=1
+
+# Enable CORS flags. Required for browser-based WebDAV clients.
+WEBDAV_FLAG_CORS=1
+
+# Enable HTTP/2 support.
+WEBDAV_FLAG_HTTP2=1
+
+# Enable HTTP Strict Transport Security (HSTS).
+# https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html
+WEBDAV_FLAG_HSTS=1
+
+# Enable the following two with care, they may break some clients.
+
+# Prefer HTTP/2 instead of using the protocol most preferred by the client.
+#WEBDAV_FLAG_PREFER_HTTP2=1
+
+# Configure SSL to only support clients that support TLS 1.3.
+#WEBDAV_FLAG_MODERN_SSL=1
