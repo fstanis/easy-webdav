@@ -5,7 +5,7 @@ SERVER_NAME="example.com"
 PORT="443"
 
 # Path to folder that holds all your files.
-WEBDAV_DATA="/data"
+WEBDAV_DATA="/webdav/data"
 
 # Path to a folder that's publicly available. Omit to disable.
 WEBDAV_PUBLIC="public"

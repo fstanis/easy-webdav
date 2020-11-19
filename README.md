@@ -21,7 +21,7 @@ Easy to configure, docker-based WebDAV server. Based on Apache HTTP Server Versi
     ```
 5. Run the container and use a [bind mount](https://docs.docker.com/storage/bind-mounts/) (`-v`) for the "secrets" folder as well as your data. Alternatively, see the next section for how to use [Docker Compose](https://docs.docker.com/compose/).
     ```bash
-    $ docker run -p 443:443 -v /path/to/your/data:/data -v $(realpath ./secrets):/run/secrets:ro easy-webdav
+    $ docker run -p 443:443 -v /path/to/your/data:/webdav/data -v $(realpath ./secrets):/run/secrets:ro easy-webdav
     ```
 
 ## Example `docker-compose.yaml`
@@ -37,7 +37,7 @@ services:
     volumes:
       - type: bind
         source: /path/to/your/data
-        target: /data
+        target: /webdav/data
     secrets:
       - fullchain
       - privkey

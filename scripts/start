@@ -44,7 +44,7 @@ set +a
   || export WEBDAV_LOCKFILE="/etc/lock/lockfile"
 
 # Create user (if needed)
-if ! id -u "$WEBDAV_USER_ID" &> /dev/null; then
+if ! id -u webdav &> /dev/null; then
   addgroup -g "$WEBDAV_GROUP_ID" webdav
   adduser -D -H -G webdav -u "$WEBDAV_USER_ID" webdav
 fi
