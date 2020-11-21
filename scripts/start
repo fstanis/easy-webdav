@@ -71,6 +71,24 @@ for user in $(grep -o '^[^:]\+' "$WEBDAV_USERS"); do
   fi
 done
 
+if [[ -n "$WEBDAV_RADICALE" && -f "/usr/local/apache2/modules/mod_wsgi.so" ]]; then
+  radicale_fake_path="$webdav_data_dir/$WEBDAV_RADICALE"
+  radicale_storage="$webdav_data_dir/$WEBDAV_RADICALE_STORAGE"
+  if [[ -d "$radicale_fake_path" ]] && ! rmdir "$radicale_fake_path"; then
+    die '$WEBDAV_RADICALE must be an empty folder or not exist'
+  fi
+  mkdir -p "$radicale_fake_path" "$radicale_storage"
+  printf '[auth]\ntype = remote_user\n[storage]\nfilesystem_folder = %s\n' \
+     "$radicale_storage" \
+     > $WEBDAV_RADICALE_CONFIG
+  if [[ -z "$WEBDAV_FLAG_RADICALE_WEB" ]]; then
+    printf '[web]\ntype = none\n' >> $WEBDAV_RADICALE_CONFIG
+  fi
+  printf 'from radicale import application\n' > "$WEBDAV_BASE/radicale.wsgi"
+  export WEBDAV_FLAG_RADICALE=1
+  export RADICALE_CONFIG="$WEBDAV_RADICALE_CONFIG"
+fi
+
 # If WEBDAV_SUPERUSER is set, it must be a real user
 if [[ -n "$WEBDAV_SUPERUSER" ]]; then
   [[ -n "$found_superuser" ]] \

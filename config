@@ -45,6 +45,11 @@ WEBDAV_SSL_CERT_KEY="/run/secrets/privkey"
 # Path the WebDAV lock file.
 #WEBDAV_LOCKFILE="/etc/lock/lockfile"
 
+WEBDAV_RADICALE="radicale"
+WEBDAV_RADICALE_CONFIG="/etc/radicale.conf"
+WEBDAV_RADICALE_STORAGE="radicale_data"
+WEBDAV_FLAG_RADICALE_WEB=1
+
 # FLAG parameters can have any value. Unset them to disable.
 
 # Log all requests to STDOUT.
