@@ -4,8 +4,11 @@ SERVER_NAME="example.com"
 # Port to bind the server to.
 PORT="443"
 
-# Path to folder that holds all your files.
-WEBDAV_DATA="/webdav/data"
+# Base directory where the WebDAV files are stored.
+WEBDAV_BASE="/webdav"
+
+# Path to folder that holds all your files, relative to WEBDAV_BASE.
+WEBDAV_DATA="data"
 
 # Path to a folder that's publicly available. Omit to disable.
 WEBDAV_PUBLIC="public"
