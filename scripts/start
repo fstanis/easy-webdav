@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Loads and validates the config file, generates the user routes and then starts
 # the webserver.
@@ -15,7 +15,7 @@ trap 'die "Error executing start script"' EXIT
   || die '$HTTPD_PREFIX not set'
 
 set -a
-source /etc/config
+. /etc/config
 set +a
 
 [[ "$PORT" -gt 0 ]] \
@@ -48,8 +48,9 @@ webdav_data_dir="$WEBDAV_BASE/$WEBDAV_DATA"
 # Create user (if needed)
 if ! id webdav &> /dev/null; then
   grep -q ":$WEBDAV_GROUP_ID:" /etc/group \
-    || addgroup -g "$WEBDAV_GROUP_ID" group
-  adduser -D -H -G group -u "$WEBDAV_USER_ID" webdav
+    || addgroup --gid "$WEBDAV_GROUP_ID" group
+  adduser --uid "$WEBDAV_USER_ID" webdav \
+    --gecos "" --disabled-password --no-create-home --ingroup group
 fi
 
 # Create the required directories and set permissions

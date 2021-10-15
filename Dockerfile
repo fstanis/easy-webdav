@@ -1,4 +1,4 @@
-FROM httpd:2.4-alpine
+FROM httpd:2.4
 
 COPY etc/httpd.conf /usr/local/apache2/conf/httpd.conf
 COPY etc/webdav.conf /usr/local/apache2/conf/webdav.conf
