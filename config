@@ -45,6 +45,12 @@ WEBDAV_SSL_CERT_KEY="/run/secrets/privkey"
 # Path the WebDAV lock file.
 #WEBDAV_LOCKFILE="/etc/lock/lockfile"
 
+# Folder and user to use for Radicale. Omit to disable Radicale.
+WEBDAV_RADICALE="radicale"
+
+# Folder to use for Radicale storage.
+WEBDAV_RADICALE_STORAGE="radicale_data"
+
 # FLAG parameters can have any value. Unset them to disable.
 
 # Log all requests to STDOUT.
@@ -59,6 +65,12 @@ WEBDAV_FLAG_HTTP2=1
 # Enable HTTP Strict Transport Security (HSTS).
 # https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html
 WEBDAV_FLAG_HSTS=1
+
+# Enable .well-known support for CalDAV and CardDAV.
+WEBDAV_FLAG_RADICALE_WELLKNOWN=1
+
+# Enable web interface of Radicale.
+#WEBDAV_FLAG_RADICALE_WEB=1
 
 # Enable the following two with care, they may break some clients.
 

@@ -60,6 +60,8 @@ for user in $(grep -o '^[^:]\+' "$WEBDAV_USERS"); do
     found_superuser=1
   elif [[ "$user" == "$WEBDAV_RO_USER" ]]; then
     found_ro_user=1
+  elif [[ "$user" == "$WEBDAV_RADICALE_USER" ]]; then
+    found_radicale_user=1
   else
     printf 'Use UserDir %s\n' "$user" >> "$WEBDAV_USERS_CONFIG"
     mkdir -p "$webdav_data_dir/$user"
@@ -82,6 +84,33 @@ fi
 if [[ -n "$WEBDAV_PUBLIC" ]]; then
   export WEBDAV_FLAG_PUBLIC=1
   mkdir -p "$webdav_data_dir/$WEBDAV_PUBLIC"
+fi
+# If WEBDAV_RADICALE_USER is set, make sure it exists
+if [[ -n "$WEBDAV_RADICALE_USER" ]]; then
+  [[ -n "$found_radicale_user" ]] \
+    || die '$WEBDAV_RADICALE not found in users'
+  export WEBDAV_FLAG_RADICALE_USER=1
+fi
+
+if [[ -n "$WEBDAV_RADICALE" && -f "$HTTPD_PREFIX/modules/mod_wsgi.so" ]]; then
+  [[ -z "$WEBDAV_RADICALE_STORAGE" ]] \
+    || die '$WEBDAV_RADICALE_STORAGE must be set when $WEBDAV_RADICALE is set'
+
+  export RADICALE_CONFIG="/etc/radicale.conf"
+  radicale_path="$webdav_data_dir/$WEBDAV_RADICALE"
+  radicale_storage="$webdav_data_dir/$WEBDAV_RADICALE_STORAGE"
+  if [[ -d "$radicale_path" ]] && ! rmdir "$radicale_path"; then
+    die '$WEBDAV_RADICALE must be empty'
+  fi
+  mkdir -p "$radicale_path" "$radicale_storage"
+  printf '[auth]\ntype = remote_user\n[storage]\nfilesystem_folder = %s\n' \
+     "$radicale_storage" \
+     > $RADICALE_CONFIG
+  if [[ -z "$WEBDAV_FLAG_RADICALE_WEB" ]]; then
+    printf '[web]\ntype = none\n' >> $RADICALE_CONFIG
+  fi
+  printf 'from radicale import application\n' > "$WEBDAV_BASE/radicale.wsgi"
+  export WEBDAV_FLAG_RADICALE=1
 fi
 
 # Create the required directories and set permissions

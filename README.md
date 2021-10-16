@@ -24,6 +24,18 @@ Easy to configure, docker-based WebDAV server. Based on Apache HTTP Server Versi
     $ docker run -p 443:443 -v /path/to/your/data:/webdav/data -v $(realpath ./secrets):/run/secrets:ro easy-webdav
     ```
 
+## CalDAV and CardDAV support
+
+To enable support for CalDAV and CardDAV, [Radicale](https://radicale.org/) must be included in the docker image. This can be done using a build argument:
+
+```bash
+$ docker build --build-arg radicale=1 -t easy-webdav .
+```
+
+In addition, at the very least, `WEBDAV_RADICALE` and `WEBDAV_RADICALE_STORAGE` must be set in the config file.
+
+Note that including Radicale significantly increases the image size.
+
 ## Example `docker-compose.yaml`
 
 ```yaml
