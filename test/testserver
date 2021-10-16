@@ -1,0 +1,11 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+docker run \
+  --rm \
+  -p 8080:8080 \
+  -v "$(realpath ./testdata/data)":/webdav/data \
+  -v "$(realpath ./testdata/secrets)":/run/secrets:ro \
+  -v "$(realpath ./testdata/config)":/etc/config:ro \
+  "$@" \
+  fstanis/easy-webdav

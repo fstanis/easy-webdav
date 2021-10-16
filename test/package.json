@@ -1,0 +1,13 @@
+{
+  "name": "easy-webdav-test",
+  "description": "Tests for easy-webdav",
+  "private": true,
+  "scripts": {
+    "test": "jest"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "jest": "^27.2.5",
+    "webdav": "^4.7.0"
+  }
+}

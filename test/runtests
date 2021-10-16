@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")"
+rm -rf testdata/data
+mkdir -p testdata/data
+
+docker_ps=$(bash ./testserver -d)
+set +e
+sleep 5
+
+export NODE_TLS_REJECT_UNAUTHORIZED=0
+npm test
+
+docker kill "$docker_ps" > /dev/null

@@ -1,0 +1,12 @@
+SERVER_NAME="localhost"
+PORT="8080"
+WEBDAV_BASE="/webdav"
+WEBDAV_DATA="data"
+WEBDAV_PUBLIC="public"
+WEBDAV_SUPERUSER="admin"
+WEBDAV_RO_USER="reader"
+WEBDAV_USERS="/run/secrets/users"
+WEBDAV_SSL_CERT="/run/secrets/fullchain"
+WEBDAV_SSL_CERT_KEY="/run/secrets/privkey"
+WEBDAV_FLAG_CORS=1
+WEBDAV_FLAG_HTTP2=1
