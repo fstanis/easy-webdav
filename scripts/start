@@ -53,12 +53,6 @@ if ! id webdav &> /dev/null; then
     --gecos "" --disabled-password --no-create-home --ingroup group
 fi
 
-# Create the required directories and set permissions
-lockfile_dir="$(dirname $WEBDAV_LOCKFILE)"
-mkdir -p "$lockfile_dir"
-chown -R "$WEBDAV_USER_ID" "$webdav_data_dir" "$lockfile_dir"
-chmod -R u+rwx "$webdav_data_dir" "$lockfile_dir"
-
 # Generate the users config that rules for each user's directory
 truncate -s 0 "$WEBDAV_USERS_CONFIG"
 for user in $(grep -o '^[^:]\+' "$WEBDAV_USERS"); do
@@ -89,6 +83,12 @@ if [[ -n "$WEBDAV_PUBLIC" ]]; then
   export WEBDAV_FLAG_PUBLIC=1
   mkdir -p "$webdav_data_dir/$WEBDAV_PUBLIC"
 fi
+
+# Create the required directories and set permissions
+lockfile_dir="$(dirname $WEBDAV_LOCKFILE)"
+mkdir -p "$lockfile_dir"
+chown -R "$WEBDAV_USER_ID" "$webdav_data_dir" "$lockfile_dir"
+chmod -R u+rwx "$webdav_data_dir" "$lockfile_dir"
 
 # Pass all exports that start with WEBDAV_FLAG_ as parameters to make them
 # accessible from <IfDefine> in Apache config
