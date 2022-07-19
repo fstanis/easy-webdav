@@ -1,12 +1,15 @@
 const { AuthType, createClient } = require('webdav');
+const dav = require('dav');
 
 const REMOTE_URL = 'https://localhost:8080/';
+const RADICALE_URL = REMOTE_URL + 'radicale';
 
 const adminClient = createClientForUser('admin');
 const fooClient = createClientForUser('foo');
 const barClient = createClientForUser('foo');
 const readerClient = createClientForUser('reader');
-const publicClient = createClient(REMOTE_URL, {  authType: AuthType.None});
+const publicClient = createClient(REMOTE_URL, { authType: AuthType.None });
+const radicaleClient = createRadicaleClient('radicale');
 
 test('foo can create files', async () => {
   const result = await fooClient.putFileContents('/foo/file', 'hello, world');
@@ -57,12 +60,45 @@ test('public can\'t read any data', async () => {
   expect401(publicClient.getDirectoryContents('/bar'));
 });
 
+test('creates calenadar object', async () => {
+  const account = await radicaleClient.createAccount({
+    server: RADICALE_URL,
+    accountType: 'caldav'
+  });
+  const [calendar] = account.calendars;
+  await radicaleClient.createCalendarObject(calendar, {
+    data: 'BEGIN:VCALENDAR\nEND:VCALENDAR',
+    filename: 'test.ics'
+  });
+});
+
+test('creates card', async () => {
+  const account = await radicaleClient.createAccount({
+    server: RADICALE_URL,
+    accountType: 'carddav'
+  });
+  const [_, addressBook] = account.addressBooks;
+  await radicaleClient.createCard(addressBook, {
+    data: 'BEGIN:VCARD\nUID:urn:uuid:abcdef\nFN:John\nEND:VCARD',
+    filename: 'test.vcf'
+  });
+});
+
 function createClientForUser(user) {
   return createClient(REMOTE_URL, {
     authType: AuthType.Password,
     username: user,
     password: 'test',
   });
+}
+
+function createRadicaleClient(user) {
+  return new dav.Client(new dav.transport.Basic(
+    new dav.Credentials({
+      username: user,
+      password: 'test'
+    })
+  ), { baseUrl: RADICALE_URL });
 }
 
 function expect401(promise) {

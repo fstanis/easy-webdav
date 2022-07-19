@@ -51,6 +51,9 @@ WEBDAV_RADICALE="radicale"
 # Folder to use for Radicale storage.
 WEBDAV_RADICALE_STORAGE="radicale_data"
 
+# Only user that can access Radicale data. Omit to give all valid users access.
+WEBDAV_RADICALE_USER="radicale"
+
 # FLAG parameters can have any value. Unset them to disable.
 
 # Log all requests to STDOUT.

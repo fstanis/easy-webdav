@@ -4,7 +4,7 @@ set -e
 
 cd "$(dirname "$0")"
 rm -rf testdata/data
-mkdir -p testdata/data
+cp -r testdata/data_base testdata/data
 
 docker_ps=$(bash ./testserver -d)
 set +e

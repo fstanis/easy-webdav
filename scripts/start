@@ -93,7 +93,7 @@ if [[ -n "$WEBDAV_RADICALE_USER" ]]; then
 fi
 
 if [[ -n "$WEBDAV_RADICALE" && -f "$HTTPD_PREFIX/modules/mod_wsgi.so" ]]; then
-  [[ -z "$WEBDAV_RADICALE_STORAGE" ]] \
+  [[ -n "$WEBDAV_RADICALE_STORAGE" ]] \
     || die '$WEBDAV_RADICALE_STORAGE must be set when $WEBDAV_RADICALE is set'
 
   export RADICALE_CONFIG="/etc/radicale.conf"
